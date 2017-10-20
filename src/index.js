@@ -97,7 +97,7 @@ class Sudoku extends React.Component{
                         rows: rows,
                         cursorPosition: coor,
                         possibilities: possibilities
-                      });
+                      } );
         console.log(newstate);
 
         this.setState({stack: newstate})
