@@ -1,0 +1,21 @@
+
+.row {
+  display: block;
+  width: 60%;
+
+}
+
+.number {
+  padding: 10px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: auto;
+
+}
+
+.button {
+  width: 50px;
+  height: 20px;
+  background: red;
+}
