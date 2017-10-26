@@ -4,9 +4,12 @@ import {getPossibilities} from '../lib/solver.js';
 import {isBoardSolved} from '../lib/solver.js';
 import {tryReplace} from '../lib/solver.js';
 import {findNull} from '../lib/solver.js';
+import {prettyBoard} from '../lib/solver.js';
+import {getCurrentFrame} from '../lib/handy.js';
 import {getCurrentRows} from '../lib/handy.js';
 import {getCurrentPossibilities} from '../lib/handy.js';
 import {getCurrentCursorPosition} from '../lib/handy.js';
+import {quickCopy} from '../lib/handy.js';
 
 import './index.css';
 
@@ -71,8 +74,9 @@ class Sudoku extends React.Component{
     //this.handleChange = this.handleChange.bind(this);
     this.state = {
       stack: [{
+        level: 0,
         rows: rows,
-        cursorPosition: [0,0],
+        cursorPosition: [-1, -1],
         possibilities: []
       }]
 
@@ -82,32 +86,35 @@ class Sudoku extends React.Component{
   solve(){
     console.log("solving");
 
-    while(!isBoardSolved(getCurrentRows(this.state))){
-      var rows = getCurrentRows(this.state);
-      var coor = findNull(rows);
-      var possibilities = getPossibilities(rows, coor)
+    renderSudoku();
+    let frame = getCurrentFrame(this.state);
 
-      if(possibilities == []){
-        this.setState({stack: this.state.stack.pop()});
-      } else {
-        rows[coor[0]][coor[1]] = possibilities.pop();
-        var newstate = this.state.stack
-        console.log(newstate);
-        newstate.push({
-                        rows: rows,
-                        cursorPosition: coor,
-                        possibilities: possibilities
-                      } );
-        console.log(newstate);
+    prettyBoard(frame.rows);
 
-        this.setState({stack: newstate})
-      }
+    if(frame.cursorPosition[0] == -1){
 
+      let cursorAndPossibilities = findNull(frame.rows)
+      frame.cursorPosition = cursorAndPossibilities[0];
+      frame.possibilities = cursorAndPossibilities[1];
+    }
 
-    // solveSudoku(this);
-    // for(var i = 0; i < 9; i++){
-    //   console.log(this.state.rows[i].join(" "));
-     }
+    if(frame.possibilities.length != 0){
+
+      frame.rows[frame.cursorPosition[0]][frame.cursorPosition[1]] = frame.possibilities.pop();
+
+      let newRows = quickCopy(frame.rows);
+
+      let newframe = {
+                      level: frame.level+1,
+                      rows: newRows,
+                      cursorPosition: [-1, -1],
+                      possibilities: []
+                    }
+      this.state.stack.push(newframe);
+
+    } else {
+      this.state.stack.pop()
+    }
   }
 
   handleSubmit(event, num){
@@ -129,26 +136,37 @@ class Sudoku extends React.Component{
     />
   }
 
-    render(){
-      return (
-        <form onSubmit={this.handleSubmit}>
-          <button onClick={() => this.solve()}>Solve</button>
-          {this.renderRow(0)}
-          {this.renderRow(1)}
-          {this.renderRow(2)}
-          {this.renderRow(3)}
-          {this.renderRow(4)}
-          {this.renderRow(5)}
-          {this.renderRow(6)}
-          {this.renderRow(7)}
-          {this.renderRow(8)}
-        </form>
-      )
-    }
+  render(){
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <button onClick={() => this.start()}>Solve</button>
+
+        {this.renderRow(0)}
+        {this.renderRow(1)}
+        {this.renderRow(2)}
+        {this.renderRow(3)}
+        {this.renderRow(4)}
+        {this.renderRow(5)}
+        {this.renderRow(6)}
+        {this.renderRow(7)}
+        {this.renderRow(8)}
+      </form>
+    )
+  }
+
+  renderSudoku(){
+    console.log("rendering");
+    ReactDOM.render(
+
+      <Sudoku />,
+      document.getElementById('root')
+
+    );
+  }
 }
 
 function renderSudoku(){
-
+  console.log("rendering");
   ReactDOM.render(
 
     <Sudoku />,
@@ -158,3 +176,4 @@ function renderSudoku(){
 }
 
 renderSudoku();
+//setInterval(renderSudoku, 1000);
