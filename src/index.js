@@ -139,7 +139,7 @@ class Sudoku extends React.Component{
   render(){
     return (
       <form onSubmit={this.handleSubmit}>
-        <button onClick={() => this.start()}>Solve</button>
+        <button onClick={() => this.solve()}>Solve</button>
 
         {this.renderRow(0)}
         {this.renderRow(1)}
